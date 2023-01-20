@@ -1,0 +1,13 @@
+https://grfia.dlsi.ua.es/primus/
+
+https://github.com/OMR-Research/tf-end-to-end/tree/02f1c53568c0ac2329b73b49cece2bed006bcf9d
+
+https://www.mdpi.com/2076-3417/8/4/606#
+
+https://book.verovio.org/installing-or-building-from-sources/python.html#basic-usage-of-the-toolkit
+
+https://program.ismir2020.net/poster_4-12.html
+
+
+Sequence to seuence model
+https://github.com/farizrahman4u/seq2seq
