@@ -35,10 +35,37 @@ def run():
 def build_model(image_width, image_height):
     input_image = layers.Input(shape=(image_width, image_height, 1), name="input_image", dtype="float32")
 
-    # First convolutional block: 32 filters; kernel size: 3 x 3; Followed by MaxPooling with window size: 2 x 2
+    # First convolutional layer: 32 filters; kernel size: 3 x 3; Batch Normalization; Leaky ReLu activation function
+    # MaxPooling layer with window size: 2 x 2
     # TODO: What about kernel_initializer?
-    x = layers.Conv2D(filters=32, kernel_size=(3, 3), activation="relu", padding="same", name="conv0")(input_image)
-    output = layers.MaxPooling2D((2, 2), name="maxPool0")(x)
+    x = layers.Conv2D(filters=32, kernel_size=(3, 3), padding="same", name="conv_0")(input_image)
+    x = layers.BatchNormalization(name="conv_0_bn")(x)
+    x = layers.LeakyReLU(alpha=0.2, name="conv_0_leaky_relu")(x)
+    x = layers.MaxPooling2D((2, 2), name="max_pool_0")(x)
+
+    # Second convolutional layer: 64 filters; kernel size: 3 x 3; Batch Normalization; Leaky ReLu activation function
+    # MaxPooling layer with window size: 2 x 2
+
+    x = layers.Conv2D(filters=64, kernel_size=(3, 3), padding="same", name="conv_1")(x)
+    x = layers.BatchNormalization(name="conv_1_bn")(x)
+    x = layers.LeakyReLU(alpha=0.2, name="conv_1_leaky_relu")(x)
+    x = layers.MaxPooling2D((2, 2), name="max_pool_1")(x)
+
+    # Third convolutional layer: 128 filters; kernel size: 3 x 3; Batch Normalization; Leaky ReLu activation function
+    # MaxPooling layer with window size: 2 x 2
+
+    x = layers.Conv2D(filters=128, kernel_size=(3, 3), padding="same", name="conv_2")(x)
+    x = layers.BatchNormalization(name="conv_2_bn")(x)
+    x = layers.LeakyReLU(alpha=0.2, name="conv_2_leaky_relu")(x)
+    x = layers.MaxPooling2D((2, 2), name="max_pool_2")(x)
+
+    # Fourth convolutional layer: 256 filters; kernel size: 3 x 3; Batch Normalization; Leaky ReLu activation function
+    # MaxPooling layer with window size: 2 x 2
+
+    x = layers.Conv2D(filters=256, kernel_size=(3, 3), padding="same", name="conv_3")(x)
+    x = layers.BatchNormalization(name="conv_3_bn")(x)
+    x = layers.LeakyReLU(alpha=0.2, name="conv_3_leaky_relu")(x)
+    output = layers.MaxPooling2D((2, 2), name="max_pool_3")(x)
 
     model = keras.models.Model(input_image, output, name="OMR_Model")
 
