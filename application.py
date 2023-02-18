@@ -1,9 +1,7 @@
 import os
 import cv2 as cv
 import numpy as np
-import tensorflow as tf
-from tensorflow import keras
-from keras import layers
+from omr_model import OMRModel
 
 
 def run():
@@ -27,53 +25,9 @@ def run():
 
     # Build model
 
-    build_model(input_image_batch.shape[2], input_image_batch.shape[1])
+    OMRModel.build_model(input_image_batch.shape[2], input_image_batch.shape[1])
 
     print("Application Stopped")
-
-
-def build_model(image_width, image_height):
-    input_image = layers.Input(shape=(image_width, image_height, 1), name="input_image", dtype="float32")
-
-    # First convolutional layer: 32 filters; kernel size: 3 x 3; Batch Normalization; Leaky ReLu activation function
-    # MaxPooling layer with window size: 2 x 2
-    # TODO: What about kernel_initializer?
-    x = layers.Conv2D(filters=32, kernel_size=(3, 3), padding="same", name="conv_0")(input_image)
-    x = layers.BatchNormalization(name="conv_0_bn")(x)
-    x = layers.LeakyReLU(alpha=0.2, name="conv_0_leaky_relu")(x)
-    x = layers.MaxPooling2D((2, 2), name="max_pool_0")(x)
-
-    # Second convolutional layer: 64 filters; kernel size: 3 x 3; Batch Normalization; Leaky ReLu activation function
-    # MaxPooling layer with window size: 2 x 2
-
-    x = layers.Conv2D(filters=64, kernel_size=(3, 3), padding="same", name="conv_1")(x)
-    x = layers.BatchNormalization(name="conv_1_bn")(x)
-    x = layers.LeakyReLU(alpha=0.2, name="conv_1_leaky_relu")(x)
-    x = layers.MaxPooling2D((2, 2), name="max_pool_1")(x)
-
-    # Third convolutional layer: 128 filters; kernel size: 3 x 3; Batch Normalization; Leaky ReLu activation function
-    # MaxPooling layer with window size: 2 x 2
-
-    x = layers.Conv2D(filters=128, kernel_size=(3, 3), padding="same", name="conv_2")(x)
-    x = layers.BatchNormalization(name="conv_2_bn")(x)
-    x = layers.LeakyReLU(alpha=0.2, name="conv_2_leaky_relu")(x)
-    x = layers.MaxPooling2D((2, 2), name="max_pool_2")(x)
-
-    # Fourth convolutional layer: 256 filters; kernel size: 3 x 3; Batch Normalization; Leaky ReLu activation function
-    # MaxPooling layer with window size: 2 x 2
-
-    x = layers.Conv2D(filters=256, kernel_size=(3, 3), padding="same", name="conv_3")(x)
-    x = layers.BatchNormalization(name="conv_3_bn")(x)
-    x = layers.LeakyReLU(alpha=0.2, name="conv_3_leaky_relu")(x)
-    output = layers.MaxPooling2D((2, 2), name="max_pool_3")(x)
-
-    model = keras.models.Model(input_image, output, name="OMR_Model")
-
-    optimizer = keras.optimizers.Adam()
-
-    model.compile(optimizer=optimizer)
-
-    model.summary()
 
 
 def prepare_output_labels(dataset_path, directory_entries, batch_size):
