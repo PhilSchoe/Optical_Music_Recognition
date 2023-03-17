@@ -6,11 +6,15 @@ from keras import layers
 class OMRModel:
 
     @staticmethod
-    def build_model(image_width, image_height):
+    def build_model(image_width, image_height, vocabulary_size):
         model_input = layers.Input(shape=(image_width, image_height, 1), name="input_image", dtype="float32")
 
         model_intermediate, new_shape = OMRModel.__build_convolutional_block(model_input)
         model_intermediate = layers.Reshape(target_shape=new_shape, name="reshape")(model_intermediate)
+
+        model_intermediate = OMRModel.__build_recurrent_block(model_intermediate)
+
+        model_intermediate = OMRModel.__build_output_block(model_intermediate, vocabulary_size)
 
         model_output = model_intermediate
         model = keras.models.Model(model_input, model_output, name="OMR_Model")
@@ -63,7 +67,7 @@ class OMRModel:
         # Leaky ReLu activation function
         # MaxPooling layer with window size: 2 x 2
 
-        last_filter_size = 256;
+        last_filter_size = 256
 
         x = layers.Conv2D(filters=last_filter_size, kernel_size=(3, 3), padding="same", name="conv_3")(x)
         x = layers.BatchNormalization(name="conv_3_bn")(x)
@@ -78,3 +82,35 @@ class OMRModel:
         new_shape = (new_width, new_height)
 
         return x, new_shape
+
+    @staticmethod
+    def __build_recurrent_block(block_input):
+        rnn_hidden_units = 256
+        rnn_hidden_layers = 2
+
+        #x = layers.LSTM(rnn_hidden_units, return_sequences=True, dropout=0.25, name="lstm_0")(block_input)
+        #x = layers.Dropout(0.25, name="drop_0")(x)
+
+        #x = layers.LSTM(rnn_hidden_units, return_sequences=True, dropout=0.25, name="lstm_1")(x)
+        #x = layers.Dropout(0.25, name="drop_1")(x)
+
+        # TODO: Check dropout?
+
+        lstm_cells = [layers.LSTMCell(rnn_hidden_units, dropout=0.25) for _ in range(rnn_hidden_layers)]
+        stacked_lstm = layers.StackedRNNCells(lstm_cells, name="stacked_lstm")
+        lstm_layer = layers.RNN(stacked_lstm, name="lstm_layer", return_sequences=False)
+
+        # TODO: Use two bidirectional rnns? Both with return_sequences=True?
+
+        x = layers.Bidirectional(lstm_layer, name="bidirectional_0")(block_input)
+        #x = layers.Bidirectional(lstm_layer, name="bidirectional_1")(x)
+
+        return x
+
+    @staticmethod
+    def __build_output_block(block_input, vocabulary_size):
+        # Add 1 for blank character
+
+        x = layers.Dense(vocabulary_size + 1, activation="softmax", name="dense_0")(block_input)
+
+        return x

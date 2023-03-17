@@ -7,6 +7,8 @@ from omr_model import OMRModel
 def run():
     print("Running Application")
 
+    # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
     dataset_path = "E:/Datasets/primusCalvoRizoAppliedSciences2018/package_aa"
     directory_entries = os.listdir(dataset_path)
     batch_size = 10
@@ -17,7 +19,8 @@ def run():
 
     # Prepare output data
 
-    output_label_batch = prepare_output_labels(dataset_path, directory_entries, batch_size)
+    word_to_int = get_word_to_int_dictionary()
+    output_label_batch = prepare_output_labels(dataset_path, directory_entries, word_to_int, batch_size)
 
     # TODO: Split data into training and validation sets?
 
@@ -25,12 +28,13 @@ def run():
 
     # Build model
 
-    OMRModel.build_model(input_image_batch.shape[2], input_image_batch.shape[1])
+    vocabulary_size = len(word_to_int)
+    OMRModel.build_model(input_image_batch.shape[2], input_image_batch.shape[1], vocabulary_size)
 
     print("Application Stopped")
 
 
-def prepare_output_labels(dataset_path, directory_entries, batch_size):
+def get_word_to_int_dictionary():
     vocabulary_file = open("vocabulary_semantic.txt", "r")
     vocabulary_list = vocabulary_file.read().splitlines()
 
@@ -43,6 +47,10 @@ def prepare_output_labels(dataset_path, directory_entries, batch_size):
 
     vocabulary_file.close()
 
+    return word_to_int
+
+
+def prepare_output_labels(dataset_path, directory_entries, word_to_int, batch_size):
     batch_label_list = []
 
     for i in range(batch_size):
